@@ -2,7 +2,9 @@ package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.UserNotFoundException;
 
+import javax.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +22,20 @@ public class UserService {
     }
 
     public UserDto updateUser(UserDto userDto, Long id) {
-        return makeUserDto(userStorage.updateUser(makeUser(userDto), id));
+        checkUserEmail(userDto);
+        if(userStorage.getUser(id) == null) {
+            new UserNotFoundException(String.format("User %s not found", id));
+        }
+        User user = userStorage.getUser(id);
+        userStorage.deleteUser(id);
+        if (userDto.getName() != null) {
+            user.setName(userDto.getName());
+        }
+        if (userDto.getEmail() != null) {
+            user.setEmail(userDto.getEmail());
+        }
+
+        return makeUserDto(userStorage.updateUser(user,id));
     }
 
     public UserDto deleteUser(Long id) {
@@ -49,5 +64,13 @@ public class UserService {
             .name(user.getName())
             .email(user.getEmail())
             .build();
+    }
+
+    private void checkUserEmail(UserDto userDto) {
+        for (var user : getAllUsers()) {
+            if (user.getEmail().equals(userDto.getEmail())) {
+                throw new ValidationException("Email " + userDto.getEmail() + " already exist");
+            }
+        }
     }
 }

@@ -25,17 +25,7 @@ public class InMemUserStorage {
     }
 
     public User updateUser(User user, Long id) {
-        User user1 = userMap.get(id);
-        if(user.getId() != null) {
-            user1.setId(user.getId());
-        } if(user.getName() != null) {
-            user1.setName(user.getName());
-        } if(user.getEmail() != null) {
-            user1.setEmail(user.getEmail());
-        }
-        userMap.remove(id);
-        emailCheck(user.getEmail());
-        userMap.put(id, user1);
+        userMap.put(id, user);
         return userMap.get(id);
     }
 
