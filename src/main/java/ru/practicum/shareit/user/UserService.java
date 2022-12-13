@@ -23,7 +23,7 @@ public class UserService {
 
     public UserDto updateUser(UserDto userDto, Long id) {
         checkUserEmail(userDto);
-        if(userStorage.getUser(id) == null) {
+        if(userStorage.getUser(id).getId() != id) {
             new UserNotFoundException(String.format("User %s not found", id));
         }
         User user = userStorage.getUser(id);

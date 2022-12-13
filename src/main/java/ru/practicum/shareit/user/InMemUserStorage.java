@@ -8,7 +8,7 @@ import java.util.*;
 @Component
 public class InMemUserStorage {
 
-    Map<Long, User> userMap = new HashMap<>();
+    private final Map<Long, User> userMap = new HashMap<>();
 
     private long userId = 0;
 
