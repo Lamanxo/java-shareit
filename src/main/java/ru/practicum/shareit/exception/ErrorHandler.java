@@ -14,7 +14,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse notFoundHandler(final UserNotFoundException e) {
         log.warn("Error User not found {}", e.getMessage());
-        return new ErrorResponse (e.getMessage());
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler

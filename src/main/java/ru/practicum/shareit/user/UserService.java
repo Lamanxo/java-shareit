@@ -60,7 +60,7 @@ public class UserService {
 
     public List<UserDto> getAllUsers() {
         List<UserDto> usersDto = new ArrayList<>();
-        for(var user : userStorage.getAllUsers()) {
+        for (var user : userStorage.getAllUsers()) {
             usersDto.add(makeUserDto(user));
         }
         return usersDto;
