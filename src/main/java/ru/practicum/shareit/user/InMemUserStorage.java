@@ -1,11 +1,13 @@
 package ru.practicum.shareit.user;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.validation.ValidationException;
 import java.util.*;
 
 @Component
+@Slf4j
 public class InMemUserStorage {
 
     private final Map<Long, User> userMap = new HashMap<>();
@@ -17,6 +19,7 @@ public class InMemUserStorage {
         userId++;
         user.setId(userId);
         userMap.put(userId, user);
+        log.info("User with id: {} was created", userId);
         return userMap.get(userId);
     }
 

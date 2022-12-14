@@ -8,7 +8,6 @@ import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.InMemUserStorage;
-import ru.practicum.shareit.user.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,70 +19,70 @@ public class ItemService {
     private final InMemUserStorage userStorage;
     private final InMemItemStorage itemStorage;
 
-    public List<ItemDto> getAllItemsByUserId(long userId) {
+    public List<ItemDto> getUserItems(long id) {
         try {
-            userStorage.getUser(userId).getId();
+            userStorage.getUser(id).getId();
         } catch (NullPointerException e) {
-            throw new UserNotFoundException(String.format("User %s not found", userId));
+            throw new UserNotFoundException(String.format("User %s not found", id));
         }
         List<ItemDto> itemDtoList = new ArrayList<>();
-        for (Item item : itemStorage.getItemsByUser(userId)) {
+        for (Item item : itemStorage.getUserItems(id)) {
             itemDtoList.add(makeItemDto(item));
         }
-        log.info("Getting users with id: {} items", userId);
+        log.info("User's with id: {} items", id);
         return itemDtoList;
     }
 
-    public ItemDto createItem(ItemDto itemDto, long userId) {
+    public ItemDto addItem(ItemDto itemDto, long id) {
         try {
-            userStorage.getUser(userId).getId();
+            userStorage.getUser(id).getId();
         } catch (NullPointerException e) {
-            throw new UserNotFoundException(String.format("User %s not found", userId));
+            throw new UserNotFoundException(String.format("User %s not found", id));
         }
         Item item = makeItem(itemDto);
-        item.setOwner(userId);
-        log.info("User {} create item", userId);
+        item.setOwner(id);
+        log.info("User's {} item created", id);
         return makeItemDto(itemStorage.addItem(item));
     }
 
-    public ItemDto updateItem(ItemDto itemDto, long itemId, long userId) {
+    public ItemDto updateItem(ItemDto itemDto, long itemId, long id) {
         Item item = itemStorage.getItem(itemId).orElseThrow(() ->
                 new ItemException(String.format("Item with id: %s not found", itemId)));
-        if (item.getOwner() != userId) {
-            log.warn("Item with id: {} not belong user with id {}", itemId, userId);
+        if (item.getOwner() != id) {
+            log.warn("Item with id: {} not belongs to user with id {}", itemId, id);
             throw new ItemException(
-                    String.format("Item with id: %s does not belong to user with id: %s", itemId, userId));
+                    String.format("Item with id: %s not belongs to user with id: %s", itemId, id));
         }
         itemStorage.deleteItem(itemId);
         if (itemDto.getName() != null) {
-            log.info("Item with id: {} update name {}", itemId, itemDto.getName());
+            log.info("Item with id: {} updated name {}", itemId, itemDto.getName());
             item.setName(itemDto.getName());
         }
         if (itemDto.getDescription() != null) {
-            log.info("Item with id: {} update description {}", itemId, itemDto.getDescription());
+            log.info("Item with id: {} updated description {}", itemId, itemDto.getDescription());
             item.setDescription(itemDto.getDescription());
         }
         if (itemDto.getAvailable() != null) {
-            log.info("Item with id: {} update available status {}", itemId, itemDto.getAvailable());
+            log.info("Item with id: {} updated available status {}", itemId, itemDto.getAvailable());
             item.setAvailable(itemDto.getAvailable());
         }
-        log.info("Item with id: {}, owner with id: {} update", itemId, userId);
+        log.info("Item with id: {}, owner with id: {} updated", itemId, id);
         return makeItemDto(itemStorage.addItem(item));
     }
 
-    public List<ItemDto> searchItems(String word) {
-        if (word.isEmpty()) {
+    public List<ItemDto> searchItem(String request) {
+        if (request.isEmpty()) {
             return new ArrayList<>();
         }
         List<ItemDto> itemDtoList = new ArrayList<>();
-        for (Item item : itemStorage.findItem(word)) {
+        for (Item item : itemStorage.searchItem(request)) {
             itemDtoList.add(makeItemDto(item));
         }
-        log.info("Searching item with keyword {}", word);
+        log.info("Searching item {}", request);
         return itemDtoList;
     }
 
-    public ItemDto getItemById(long itemId) {
+    public ItemDto getItem(long itemId) {
         log.info("Getting item with id: {}", itemId);
         return makeItemDto(itemStorage.getItem(itemId).orElseThrow(() ->
                 new ItemException(String.format("Item with id: %s not found", itemId))));

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.UserNotFoundException;
 
@@ -10,6 +11,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
     private final InMemUserStorage userStorage;
 
@@ -18,13 +20,21 @@ public class UserService {
     }
 
     public UserDto getUser(Long id) {
+        try {
+            userStorage.getUser(id).getId();
+        } catch (NullPointerException e) {
+            throw new UserNotFoundException(String.format("User %s not found", id));
+        }
+        log.info("Getting user with id: {}", id);
         return makeUserDto(userStorage.getUser(id));
     }
 
     public UserDto updateUser(UserDto userDto, Long id) {
         checkUserEmail(userDto);
-        if(userStorage.getUser(id).getId() != id) {
-            new UserNotFoundException(String.format("User %s not found", id));
+        try {
+            userStorage.getUser(id).getId();
+        } catch (NullPointerException e) {
+            throw new UserNotFoundException(String.format("User %s not found", id));
         }
         User user = userStorage.getUser(id);
         userStorage.deleteUser(id);
@@ -34,11 +44,17 @@ public class UserService {
         if (userDto.getEmail() != null) {
             user.setEmail(userDto.getEmail());
         }
-
+        log.info("User with id: {} updated", id);
         return makeUserDto(userStorage.updateUser(user,id));
     }
 
     public UserDto deleteUser(Long id) {
+        try {
+            userStorage.getUser(id).getId();
+        } catch (NullPointerException e) {
+            throw new UserNotFoundException(String.format("User %s not found", id));
+        }
+        log.info("User with id: {} removed", id);
         return makeUserDto(userStorage.deleteUser(id));
     }
 

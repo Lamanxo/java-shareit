@@ -16,7 +16,7 @@ public class InMemItemStorage {
 private final Map<Long, Item> items = new HashMap<>();
 private Long itemId = 1L;
 
-    public List<Item> getItemsByUser(Long userId) {
+    public List<Item> getUserItems(Long userId) {
         return items.values().stream()
                 .filter(item -> item.getOwner() == userId)
                 .collect(Collectors.toList());
@@ -28,7 +28,7 @@ private Long itemId = 1L;
 
     public Item addItem(Item item) {
         if (items.containsKey(item.getId())) {
-            throw new ItemException(String.format("Item with id %s already create", item.getId()));
+            throw new ItemException(String.format("Item with id %s already exist", item.getId()));
         }
         if (item.getId() == 0) {
             item.setId(itemId++);
@@ -37,7 +37,7 @@ private Long itemId = 1L;
         return item;
     }
 
-    public List<Item> findItem(String word) {
+    public List<Item> searchItem(String word) {
         return items.values().stream()
                 .filter(Item::getAvailable)
                 .filter(item -> item.getName().toLowerCase().contains(word.toLowerCase())
