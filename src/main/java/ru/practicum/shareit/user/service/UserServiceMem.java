@@ -1,18 +1,23 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.user.repo.InMemUserStorage;
+import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import javax.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Qualifier("UserServiceMemory")
 @RequiredArgsConstructor
 @Slf4j
-public class UserService {
+public class UserServiceMem implements UserService{
     private final InMemUserStorage userStorage;
 
     public UserDto addUser(UserDto userDto) {

@@ -1,21 +1,25 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ItemException;
 import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.repo.InMemItemStorage;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.InMemUserStorage;
+import ru.practicum.shareit.user.repo.InMemUserStorage;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Qualifier("ItemServiceMem")
 @RequiredArgsConstructor
 @Slf4j
-public class ItemService {
+public class ItemServiceMem implements ItemService{
     private final InMemUserStorage userStorage;
     private final InMemItemStorage itemStorage;
 
@@ -82,7 +86,12 @@ public class ItemService {
         return itemDtoList;
     }
 
-    public ItemDto getItem(long itemId) {
+    @Override
+    public CommentDto saveComment(CommentDto commentDto, Long userId, Long itemId) {
+        return null;
+    }
+
+    public ItemDto getItem(long itemId, Long userId) {
         log.info("Getting item with id: {}", itemId);
         return makeItemDto(itemStorage.getItem(itemId).orElseThrow(() ->
                 new ItemException(String.format("Item with id: %s not found", itemId))));

@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.validation.ValidationException;
+
 @RestControllerAdvice
 @Slf4j
 public class ErrorHandler {
@@ -21,6 +23,19 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse itemErrorHandler(final ItemException e) {
         log.warn("Error with item {}", e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse dataConflict(final ValidationException e) {
+        log.warn("Error conflict data {}", e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse badRequestBooking(final BookingException e) {
+        log.warn("Error conflict data {}", e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
 }
