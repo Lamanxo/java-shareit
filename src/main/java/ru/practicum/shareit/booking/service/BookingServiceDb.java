@@ -93,9 +93,6 @@ public class BookingServiceDb implements BookingService{
         for (Booking booking : bookings) {
             dtoOuts.add(makeDtoOut(booking,userId));
         }
-        /*List<BookingDtoOut> dtoOuts1 = dtoOuts.stream()
-                .sorted(Comparator.comparing(BookingDtoOut::getId).reversed())
-                .collect(Collectors.toList());*/
         return dtoOuts;
     }
 

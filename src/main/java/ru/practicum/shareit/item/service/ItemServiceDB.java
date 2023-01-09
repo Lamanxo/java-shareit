@@ -18,8 +18,10 @@ import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Qualifier("ItemServiceDB")
@@ -40,10 +42,16 @@ public class ItemServiceDB implements ItemService {
     @Override
     public List<ItemDto> getUserItems(long id) {
         userService.getUser(id);
-        List<Item> items = itemRepo.findAllByOwner(id);
+        List<Item> items = itemRepo.findAllByOwner(id).stream()
+                .sorted(Comparator.comparing(Item::getId))
+                .collect(Collectors.toList());
         List<ItemDto> itemDtos = new ArrayList<>();
         for (Item item : items) {
-            itemDtos.add(fillWithBookings(makeItemDto(item)));
+            List<Comment> comments = commentRepo.findAllByItemIdOrderByCreatedDesc(item.getId());
+            ItemDto dto = makeItemDto(item);
+            fillWithBookings(dto);
+            fillWithCommentDtos(comments);
+            itemDtos.add(dto);
         }
         return itemDtos;
     }
@@ -97,7 +105,7 @@ public class ItemServiceDB implements ItemService {
         if(item.getOwner().equals(userId)) {
             fillWithBookings(dto);
         }
-
+        dto.setComments(fillWithCommentDtos(commentRepo.findAllByItemIdOrderByCreatedDesc(itemId)));
         return dto;
     }
 
@@ -109,6 +117,14 @@ public class ItemServiceDB implements ItemService {
         return itemDto;
     }
 
+    private List<CommentDto> fillWithCommentDtos(List<Comment> comments) {
+        List<CommentDto> dtos = new ArrayList<>();
+        for (Comment comment : comments) {
+            dtos.add(makeCommentDto(comment));
+        }
+        return dtos;
+    }
+
     @Override
     public CommentDto saveComment(CommentDto commentDto, Long userId, Long itemId) {
         UserDto userDto = userService.getUser(userId);
@@ -117,6 +133,9 @@ public class ItemServiceDB implements ItemService {
                 new BookingException("User: " + userId + " not uses this item"));
         if (booking.getStatus().equals(Status.REJECTED)) {
             throw new BookingException("User: " + userId + " not uses this item");
+        }
+        if (!booking.getEnd().isBefore(LocalDateTime.now())) {
+            throw new BookingException("Leave comment only after using item");
         }
         Comment comment = makeComment(commentDto);
         comment.setAuthorId(userId);
@@ -148,6 +167,7 @@ public class ItemServiceDB implements ItemService {
                 .id(comment.getId())
                 .text(comment.getText())
                 .created(comment.getCreated())
+                .authorName(userService.getUser(comment.getAuthorId()).getName())
                 .build();
     }
 

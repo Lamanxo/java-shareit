@@ -10,6 +10,11 @@ import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
+    @Query(value = "select * " +
+            "from bookings " +
+            "where booker_id = ?1 " +
+            "order by start_time desc",
+            nativeQuery = true)
     List<Booking> findAllByBookerIdOrderByStartDesc(Long userId);
 
     @Query(value = "select * " +
