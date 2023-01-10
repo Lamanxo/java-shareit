@@ -87,7 +87,7 @@ public class ItemServiceMem implements ItemService{
     }
 
     @Override
-    public CommentDto saveComment(CommentDto commentDto, Long userId, Long itemId) {
+    public CommentDto addComment(CommentDto commentDto, Long userId, Long itemId) {
         return null;
     }
 

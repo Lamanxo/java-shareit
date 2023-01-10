@@ -9,6 +9,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repo.BookingRepository;
+import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.BookingException;
 import ru.practicum.shareit.exception.ItemException;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -45,11 +46,11 @@ public class BookingServiceDb implements BookingService{
         Booking booking = makeBooking(dtoIn);
         List<ItemDto> itemDtos = itemService.getUserItems(userId);
         if(itemDtos.contains(itemDto)) {
-            throw new ItemException("Owner cant booking own item");                  //////////////need 404 status
+            throw new BookingException("Owner cant booking his own item");
         }
         if (!itemService.getItem(booking.getItemId(), userId).getAvailable() || dtoIn.getStart().isAfter(dtoIn.getEnd()) ||
         dtoIn.getStart().isBefore(LocalDateTime.now())) {
-            throw new BookingException("Item is not available");
+            throw new BadRequestException("Item is not available");
         }
         booking.setBookerId(userId);
         booking.setStatus(Status.WAITING);
@@ -60,14 +61,14 @@ public class BookingServiceDb implements BookingService{
     public BookingDtoOut approve(Long userId, Long bookingId, Boolean approved) {
         Booking booking = bookingOrException(bookingId);
         if(booking.getStatus().equals(Status.APPROVED)) {
-            throw new BookingException("dddsss");                                      ///////////////////400
+            throw new BadRequestException("Booking already approved");
         }
         if(approved && ownerCheck(userId, bookingId)) {
              booking.setStatus(Status.APPROVED);
         } else if (!approved && ownerCheck(userId,bookingId)) {
              booking.setStatus(Status.REJECTED);
         } else {
-            throw new ItemException("ddddd");                                                //////////404
+            throw new BookingException("Only owner approves booking");
         }
         return makeDtoOut(bookingRepo.save(booking), userId);
     }
@@ -76,7 +77,7 @@ public class BookingServiceDb implements BookingService{
     public BookingDtoOut getById(Long userId, Long bookingId) {
         Booking booking = bookingOrException(bookingId);
         if(!booking.getBookerId().equals(userId) && !ownerCheck(userId,bookingId)) {
-            throw new ItemException("User: " + userId + " not owns booking with id: " + bookingId); //изменить
+            throw new BookingException("User: " + userId + " not owns booking with id: " + bookingId);
         }
         return makeDtoOut(booking, userId);
     }
@@ -84,7 +85,7 @@ public class BookingServiceDb implements BookingService{
     @Override
     public List<BookingDtoOut> getAllByUser(Long userId, String state) {
         if (!ObjectUtils.containsConstant(State.values(), state)) {
-            throw new BookingException("Unknown state: " + state);
+            throw new BadRequestException("Unknown state: " + state);
         }
         userService.getUser(userId);
         List<Booking> bookings = bookingRepo.findAllByBookerIdOrderByStartDesc(userId);
@@ -99,7 +100,7 @@ public class BookingServiceDb implements BookingService{
     @Override
     public List<BookingDtoOut> getAllByOwner(Long userId, String state) {
         if (!ObjectUtils.containsConstant(State.values(), state)) {
-            throw new BookingException("Unknown state: " + state);
+            throw new BadRequestException("Unknown state: " + state);
         }
         userService.getUser(userId);
         List<Booking> bookings = bookingRepo.findAllByOwnerStartDesc(userId);
@@ -141,7 +142,7 @@ public class BookingServiceDb implements BookingService{
 
     private Booking bookingOrException(Long bookingId) {
         return bookingRepo.findById(bookingId).orElseThrow(() ->
-                new ItemException("Booking with id: " + bookingId + " not found"));
+                new BookingException("Booking with id: " + bookingId + " not found"));
     }
 
     private Boolean ownerCheck(Long userId, Long bookingId) {

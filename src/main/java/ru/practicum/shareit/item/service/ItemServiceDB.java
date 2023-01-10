@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repo.BookingRepository;
+import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.BookingException;
 import ru.practicum.shareit.exception.ItemException;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -126,16 +127,16 @@ public class ItemServiceDB implements ItemService {
     }
 
     @Override
-    public CommentDto saveComment(CommentDto commentDto, Long userId, Long itemId) {
+    public CommentDto addComment(CommentDto commentDto, Long userId, Long itemId) {
         UserDto userDto = userService.getUser(userId);
         getItem(itemId, userId);
         Booking booking = bookingRepo.findItemByBooker(userId, itemId).orElseThrow(() ->
-                new BookingException("User: " + userId + " not uses this item"));
+                new BadRequestException("User: " + userId + " not uses this item"));
         if (booking.getStatus().equals(Status.REJECTED)) {
-            throw new BookingException("User: " + userId + " not uses this item");
+            throw new BadRequestException("User: " + userId + " not uses this item");
         }
         if (!booking.getEnd().isBefore(LocalDateTime.now())) {
-            throw new BookingException("Leave comment only after using item");
+            throw new BadRequestException("Comment only after booking end time expired");
         }
         Comment comment = makeComment(commentDto);
         comment.setAuthorId(userId);

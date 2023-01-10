@@ -33,9 +33,16 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse badRequestBooking(final BookingException e) {
         log.warn("Error conflict data {}", e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse badRequest(final BadRequestException e) {
+        log.warn("Input data invalid {}" ,e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
 }

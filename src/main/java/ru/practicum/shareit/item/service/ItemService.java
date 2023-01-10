@@ -17,7 +17,7 @@ public interface ItemService {
 
     ItemDto getItem(long itemId, Long userId);
 
-    CommentDto saveComment(CommentDto commentDto, Long userId, Long itemId);
+    CommentDto addComment(CommentDto commentDto, Long userId, Long itemId);
 
 
 
