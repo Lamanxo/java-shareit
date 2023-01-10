@@ -17,9 +17,7 @@ private final Map<Long, Item> items = new HashMap<>();
 private Long itemId = 1L;
 
     public List<Item> getUserItems(Long userId) {
-        return items.values().stream()
-                .filter(item -> item.getOwner() == userId)
-                .collect(Collectors.toList());
+        return null;
     }
 
     public Optional<Item> getItem(Long id) {
