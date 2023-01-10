@@ -19,7 +19,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "and item_id = ?2 " +
             "limit 1 ",
             nativeQuery = true)
-    Optional<Booking> findItemIdByBooker(Long bookerId, Long ItemId);
+    Optional<Booking> findItemIdByBooker(Long bookerId, Long itemId);
 
     @Query("select b " +
             "from Booking b " +
