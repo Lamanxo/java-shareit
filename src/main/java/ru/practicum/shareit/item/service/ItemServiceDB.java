@@ -6,7 +6,6 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repo.BookingRepository;
 import ru.practicum.shareit.exception.BadRequestException;
-import ru.practicum.shareit.exception.BookingException;
 import ru.practicum.shareit.exception.ItemException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -103,7 +102,7 @@ public class ItemServiceDB implements ItemService {
         Item item = itemRepo.findById(itemId).orElseThrow(() ->
                 new ItemException("Item with id: " + itemId + " not found"));
         ItemDto dto = makeItemDto(item);
-        if(item.getOwner().equals(userId)) {
+        if (item.getOwner().equals(userId)) {
             fillWithBookings(dto);
         }
         dto.setComments(fillWithCommentDtos(commentRepo.findAllByItemIdOrderByCreatedDesc(itemId)));
@@ -130,7 +129,7 @@ public class ItemServiceDB implements ItemService {
     public CommentDto addComment(CommentDto commentDto, Long userId, Long itemId) {
         UserDto userDto = userService.getUser(userId);
         getItem(itemId, userId);
-        Booking booking = bookingRepo.findItemByBooker(userId, itemId).orElseThrow(() ->
+        Booking booking = bookingRepo.findItemIdByBooker(userId, itemId).orElseThrow(() ->
                 new BadRequestException("User: " + userId + " not uses this item"));
         if (booking.getStatus().equals(Status.REJECTED)) {
             throw new BadRequestException("User: " + userId + " not uses this item");

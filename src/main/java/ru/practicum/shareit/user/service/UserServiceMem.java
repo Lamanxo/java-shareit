@@ -17,7 +17,7 @@ import java.util.List;
 @Qualifier("UserServiceMemory")
 @RequiredArgsConstructor
 @Slf4j
-public class UserServiceMem implements UserService{
+public class UserServiceMem implements UserService {
     private final InMemUserStorage userStorage;
 
     public UserDto addUser(UserDto userDto) {

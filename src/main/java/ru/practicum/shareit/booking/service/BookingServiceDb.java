@@ -11,7 +11,6 @@ import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repo.BookingRepository;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.BookingException;
-import ru.practicum.shareit.exception.ItemException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.service.UserService;
@@ -19,12 +18,11 @@ import ru.practicum.shareit.user.service.UserService;
 import javax.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class BookingServiceDb implements BookingService{
+public class BookingServiceDb implements BookingService {
 
     BookingRepository bookingRepo;
     UserService userService;
@@ -45,7 +43,7 @@ public class BookingServiceDb implements BookingService{
         ItemDto itemDto = itemService.getItem(dtoIn.getItemId(),userId);
         Booking booking = makeBooking(dtoIn);
         List<ItemDto> itemDtos = itemService.getUserItems(userId);
-        if(itemDtos.contains(itemDto)) {
+        if (itemDtos.contains(itemDto)) {
             throw new BookingException("Owner cant booking his own item");
         }
         if (!itemService.getItem(booking.getItemId(), userId).getAvailable() || dtoIn.getStart().isAfter(dtoIn.getEnd()) ||
@@ -60,10 +58,10 @@ public class BookingServiceDb implements BookingService{
     @Override
     public BookingDtoOut approve(Long userId, Long bookingId, Boolean approved) {
         Booking booking = bookingOrException(bookingId);
-        if(booking.getStatus().equals(Status.APPROVED)) {
+        if (booking.getStatus().equals(Status.APPROVED)) {
             throw new BadRequestException("Booking already approved");
         }
-        if(approved && ownerCheck(userId, bookingId)) {
+        if (approved && ownerCheck(userId, bookingId)) {
              booking.setStatus(Status.APPROVED);
         } else if (!approved && ownerCheck(userId,bookingId)) {
              booking.setStatus(Status.REJECTED);
@@ -76,7 +74,7 @@ public class BookingServiceDb implements BookingService{
     @Override
     public BookingDtoOut getById(Long userId, Long bookingId) {
         Booking booking = bookingOrException(bookingId);
-        if(!booking.getBookerId().equals(userId) && !ownerCheck(userId,bookingId)) {
+        if (!booking.getBookerId().equals(userId) && !ownerCheck(userId,bookingId)) {
             throw new BookingException("User: " + userId + " not owns booking with id: " + bookingId);
         }
         return makeDtoOut(booking, userId);
@@ -148,7 +146,7 @@ public class BookingServiceDb implements BookingService{
     private Boolean ownerCheck(Long userId, Long bookingId) {
         List<ItemDto> listDto = itemService.getUserItems(userId);
         Booking booking = bookingOrException(bookingId);
-        if(!listDto.contains(itemService.getItem(booking.getItemId(), userId))) {
+        if (!listDto.contains(itemService.getItem(booking.getItemId(), userId))) {
             return false;
         }
         return true;

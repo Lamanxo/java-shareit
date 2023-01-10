@@ -19,7 +19,7 @@ import java.util.List;
 @Qualifier("ItemServiceMem")
 @RequiredArgsConstructor
 @Slf4j
-public class ItemServiceMem implements ItemService{
+public class ItemServiceMem implements ItemService {
     private final InMemUserStorage userStorage;
     private final InMemItemStorage itemStorage;
 

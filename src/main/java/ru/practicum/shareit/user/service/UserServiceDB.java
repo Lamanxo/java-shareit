@@ -14,6 +14,7 @@ import ru.practicum.shareit.user.repo.UserRepository;
 import javax.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
+
 @Service
 @Qualifier("UserServiceDB")
 @Slf4j
@@ -21,6 +22,7 @@ import java.util.List;
 public class UserServiceDB implements UserService {
 
     private final UserRepository userRepo;
+
     @Transactional
     @Override
     public UserDto addUser(UserDto userDto) {
