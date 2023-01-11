@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.repo;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exception.ItemException;
@@ -17,9 +17,7 @@ private final Map<Long, Item> items = new HashMap<>();
 private Long itemId = 1L;
 
     public List<Item> getUserItems(Long userId) {
-        return items.values().stream()
-                .filter(item -> item.getOwner() == userId)
-                .collect(Collectors.toList());
+        return null;
     }
 
     public Optional<Item> getItem(Long id) {
