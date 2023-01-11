@@ -1,8 +1,11 @@
 package ru.practicum.shareit.booking.service;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.model.Booking;
@@ -22,6 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class BookingServiceDb implements BookingService {
 
     BookingRepository bookingRepo;
@@ -41,7 +45,7 @@ public class BookingServiceDb implements BookingService {
     public BookingDtoOut addBooking(Long userId, BookingDtoIn dtoIn) {
         userService.getUser(userId);
         ItemDto itemDto = itemService.getItem(dtoIn.getItemId(),userId);
-        Booking booking = makeBooking(dtoIn);
+        Booking booking = BookingMapper.makeBooking(dtoIn);
         List<ItemDto> itemDtos = itemService.getUserItems(userId);
         if (itemDtos.contains(itemDto)) {
             throw new BookingException("Owner cant booking his own item");
@@ -52,7 +56,7 @@ public class BookingServiceDb implements BookingService {
         }
         booking.setBookerId(userId);
         booking.setStatus(Status.WAITING);
-        return makeDtoOut(bookingRepo.save(booking), userId);
+        return makeFullDtoOut(bookingRepo.save(booking), userId);
     }
 
     @Override
@@ -68,7 +72,7 @@ public class BookingServiceDb implements BookingService {
         } else {
             throw new BookingException("Only owner approves booking");
         }
-        return makeDtoOut(bookingRepo.save(booking), userId);
+        return makeFullDtoOut(bookingRepo.save(booking), userId);
     }
 
     @Override
@@ -77,7 +81,7 @@ public class BookingServiceDb implements BookingService {
         if (!booking.getBookerId().equals(userId) && !ownerCheck(userId,bookingId)) {
             throw new BookingException("User: " + userId + " not owns booking with id: " + bookingId);
         }
-        return makeDtoOut(booking, userId);
+        return makeFullDtoOut(booking, userId);
     }
 
     @Override
@@ -90,7 +94,7 @@ public class BookingServiceDb implements BookingService {
         bookings = getBookingsByState(State.valueOf(state), bookings);
         List<BookingDtoOut> dtoOuts = new ArrayList<>();
         for (Booking booking : bookings) {
-            dtoOuts.add(makeDtoOut(booking,userId));
+            dtoOuts.add(makeFullDtoOut(booking,userId));
         }
         return dtoOuts;
     }
@@ -105,7 +109,7 @@ public class BookingServiceDb implements BookingService {
         bookings = getBookingsByState(State.valueOf(state),bookings);
         List<BookingDtoOut> dtoOuts = new ArrayList<>();
         for (Booking booking : bookings) {
-            dtoOuts.add(makeDtoOut(booking, userId));
+            dtoOuts.add(makeFullDtoOut(booking, userId));
         }
         return dtoOuts;
     }
@@ -152,22 +156,10 @@ public class BookingServiceDb implements BookingService {
         return true;
     }
 
-    private Booking makeBooking(BookingDtoIn dtoIn) {
-        Booking booking = new Booking();
-        booking.setItemId(dtoIn.getItemId());
-        booking.setStart(dtoIn.getStart());
-        booking.setEnd(dtoIn.getEnd());
-        return booking;
-    }
-
-    private BookingDtoOut makeDtoOut(Booking booking, Long userId) {
-        BookingDtoOut dto = new BookingDtoOut();
-        dto.setId(booking.getId());
+    private BookingDtoOut makeFullDtoOut(Booking booking, Long userId) {
+        BookingDtoOut dto = BookingMapper.makeBookingDtoOut(booking);
         dto.setItem(itemService.getItem(booking.getItemId(), userId));
         dto.setBooker(userService.getUser(booking.getBookerId()));
-        dto.setStart(booking.getStart());
-        dto.setEnd(booking.getEnd());
-        dto.setStatus(booking.getStatus());
         return dto;
     }
 }

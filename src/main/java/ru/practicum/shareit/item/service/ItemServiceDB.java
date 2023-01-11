@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.model.Booking;
@@ -7,6 +8,8 @@ import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repo.BookingRepository;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.ItemException;
+import ru.practicum.shareit.item.CommentMapper;
+import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Comment;
@@ -23,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Qualifier("ItemServiceDB")
 public class ItemServiceDB implements ItemService {
@@ -48,20 +52,22 @@ public class ItemServiceDB implements ItemService {
         List<ItemDto> itemDtos = new ArrayList<>();
         for (Item item : items) {
             List<Comment> comments = commentRepo.findAllByItemIdOrderByCreatedDesc(item.getId());
-            ItemDto dto = makeItemDto(item);
+            ItemDto dto = ItemMapper.makeItemDto(item);
             fillWithBookings(dto);
             fillWithCommentDtos(comments);
             itemDtos.add(dto);
         }
+        log.info("Getting all Items of User: {}", id);
         return itemDtos;
     }
 
     @Override
     public ItemDto addItem(ItemDto itemDto, long id) {
         userService.getUser(id);
-        Item item = makeItem(itemDto);
+        Item item = ItemMapper.makeItem(itemDto);
         item.setOwner(id);
-        return makeItemDto(itemRepo.save(item));
+        log.info("Adding Item to User: {}", id);
+        return ItemMapper.makeItemDto(itemRepo.save(item));
     }
 
     @Override
@@ -81,8 +87,8 @@ public class ItemServiceDB implements ItemService {
         if (itemDto.getAvailable() != null) {
             item.setAvailable(itemDto.getAvailable());
         }
-
-        return makeItemDto(itemRepo.save(item));
+        log.info("Item {} has been updated", itemId);
+        return ItemMapper.makeItemDto(itemRepo.save(item));
     }
 
     @Override
@@ -92,8 +98,9 @@ public class ItemServiceDB implements ItemService {
         }
         List<ItemDto> itemsDto = new ArrayList<>();
         for (Item item : itemRepo.findItemByText(request)) {
-            itemsDto.add(makeItemDto(item));
+            itemsDto.add(ItemMapper.makeItemDto(item));
         }
+        log.info("Searching Item with keyword {}", request);
         return itemsDto;
     }
 
@@ -101,11 +108,12 @@ public class ItemServiceDB implements ItemService {
     public ItemDto getItem(long itemId, Long userId) {
         Item item = itemRepo.findById(itemId).orElseThrow(() ->
                 new ItemException("Item with id: " + itemId + " not found"));
-        ItemDto dto = makeItemDto(item);
+        ItemDto dto = ItemMapper.makeItemDto(item);
         if (item.getOwner().equals(userId)) {
             fillWithBookings(dto);
         }
         dto.setComments(fillWithCommentDtos(commentRepo.findAllByItemIdOrderByCreatedDesc(itemId)));
+        log.info("Getting Item with ID: {}", userId);
         return dto;
     }
 
@@ -120,7 +128,7 @@ public class ItemServiceDB implements ItemService {
     private List<CommentDto> fillWithCommentDtos(List<Comment> comments) {
         List<CommentDto> dtos = new ArrayList<>();
         for (Comment comment : comments) {
-            dtos.add(makeCommentDto(comment));
+            dtos.add(makeFullCommentDto(comment));
         }
         return dtos;
     }
@@ -137,44 +145,18 @@ public class ItemServiceDB implements ItemService {
         if (!booking.getEnd().isBefore(LocalDateTime.now())) {
             throw new BadRequestException("Comment only after booking end time expired");
         }
-        Comment comment = makeComment(commentDto);
+        Comment comment = CommentMapper.makeComment(commentDto);
         comment.setAuthorId(userId);
         comment.setItemId(itemId);
-        CommentDto dto = makeCommentDto(commentRepo.save(comment));
+        CommentDto dto = makeFullCommentDto(commentRepo.save(comment));
         dto.setAuthorName(userDto.getName());
+        log.info("Comment added with text {}", dto.getText());
         return dto;
     }
 
-    private ItemDto makeItemDto(Item item) {
-        return ItemDto.builder().id(item.getId())
-                .name(item.getName())
-                .description(item.getDescription())
-                .available(item.getAvailable())
-                .comments(new ArrayList<CommentDto>())
-                .build();
-    }
-
-    private Item makeItem(ItemDto itemDto) {
-        return Item.builder().id(itemDto.getId())
-                .name(itemDto.getName())
-                .description(itemDto.getDescription())
-                .available(itemDto.getAvailable())
-                .build();
-    }
-
-    private CommentDto makeCommentDto(Comment comment) {
-        return CommentDto.builder()
-                .id(comment.getId())
-                .text(comment.getText())
-                .created(comment.getCreated())
-                .authorName(userService.getUser(comment.getAuthorId()).getName())
-                .build();
-    }
-
-    private Comment makeComment(CommentDto cDto) {
-        return Comment.builder()
-                .text(cDto.getText())
-                .created(LocalDateTime.now())
-                .build();
+    private CommentDto makeFullCommentDto(Comment comment) {
+        CommentDto dto = CommentMapper.makeCommentDto(comment);
+        dto.setAuthorName(userService.getUser(comment.getAuthorId()).getName());
+        return dto;
     }
 }

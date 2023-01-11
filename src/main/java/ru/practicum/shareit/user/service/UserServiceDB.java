@@ -7,6 +7,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.repo.UserRepository;
@@ -28,11 +29,12 @@ public class UserServiceDB implements UserService {
     public UserDto addUser(UserDto userDto) {
         User user;
         try {
-            user = userRepo.save(makeUser(userDto));
+            user = userRepo.save(UserMapper.makeUser(userDto));
         } catch (DataIntegrityViolationException e) {
             throw new ValidationException("This email already used");
         }
-        return makeUserDto(user);
+        log.info("User {} created", user.getName());
+        return UserMapper.makeUserDto(user);
 
     }
 
@@ -40,8 +42,8 @@ public class UserServiceDB implements UserService {
     public UserDto getUser(Long id) {
         User user = userRepo.findById(id).orElseThrow(() ->
                 new UserNotFoundException("User with id: " + id + " not found"));
-
-        return makeUserDto(user);
+        log.info("Finding user with ID: {}", id);
+        return UserMapper.makeUserDto(user);
     }
 
     @Override
@@ -54,7 +56,7 @@ public class UserServiceDB implements UserService {
             userDto1.setEmail(userDto.getEmail());
         }
         log.info("User with id: {} updated", id);
-        userRepo.save(makeUser(userDto1));
+        userRepo.save(UserMapper.makeUser(userDto1));
         return getUser(id);
     }
 
@@ -62,6 +64,7 @@ public class UserServiceDB implements UserService {
     public UserDto deleteUser(Long id) {
         UserDto userDto = getUser(id);
         userRepo.deleteById(id);
+        log.warn("Deleting User with ID: {}", id);
         return userDto;
     }
 
@@ -69,24 +72,9 @@ public class UserServiceDB implements UserService {
     public List<UserDto> getAllUsers() {
         List<UserDto> userDtos = new ArrayList<>();
         for (User user : userRepo.findAll()) {
-            userDtos.add(makeUserDto(user));
+            userDtos.add(UserMapper.makeUserDto(user));
         }
+        log.warn("Getting all users");
         return userDtos;
-    }
-
-    private User makeUser(UserDto userDto) {
-        return User.builder()
-                .id(userDto.getId())
-                .name(userDto.getName())
-                .email(userDto.getEmail())
-                .build();
-    }
-
-    private UserDto makeUserDto(User user) {
-        return UserDto.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .build();
     }
 }
