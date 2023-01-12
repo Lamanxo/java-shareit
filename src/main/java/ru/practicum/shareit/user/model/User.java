@@ -1,14 +1,12 @@
 package ru.practicum.shareit.user.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
-@Data
 @Builder
+@Getter
+@Setter
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Entity

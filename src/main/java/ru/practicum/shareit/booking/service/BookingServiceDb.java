@@ -1,7 +1,5 @@
 package ru.practicum.shareit.booking.service;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -25,12 +23,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class BookingServiceDb implements BookingService {
 
-    BookingRepository bookingRepo;
-    UserService userService;
-    ItemService itemService;
+    private final BookingRepository bookingRepo;
+    private final UserService userService;
+    private final ItemService itemService;
 
 
     public BookingServiceDb(BookingRepository bookingRepo, @Qualifier("UserServiceDB") UserService userService,

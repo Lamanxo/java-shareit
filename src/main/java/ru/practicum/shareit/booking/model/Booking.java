@@ -1,14 +1,16 @@
 package ru.practicum.shareit.booking.model;
 
 import lombok.AccessLevel;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Getter
+@Setter
 @Entity
 @Table(name = "bookings")
 public class Booking {
