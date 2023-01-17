@@ -2,10 +2,8 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.model.User;
@@ -17,14 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@Qualifier("UserServiceDB")
 @Slf4j
 @RequiredArgsConstructor
 public class UserServiceDB implements UserService {
 
     private final UserRepository userRepo;
 
-    @Transactional
     @Override
     public UserDto addUser(UserDto userDto) {
         User user;

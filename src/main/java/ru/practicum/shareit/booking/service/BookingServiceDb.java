@@ -1,6 +1,6 @@
 package ru.practicum.shareit.booking.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import ru.practicum.shareit.booking.BookingMapper;
@@ -23,20 +23,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class BookingServiceDb implements BookingService {
 
     private final BookingRepository bookingRepo;
     private final UserService userService;
     private final ItemService itemService;
-
-
-    public BookingServiceDb(BookingRepository bookingRepo, @Qualifier("UserServiceDB") UserService userService,
-                            @Qualifier("ItemServiceDB") ItemService itemService) {
-        this.bookingRepo = bookingRepo;
-        this.userService = userService;
-        this.itemService = itemService;
-
-    }
 
     @Override
     public BookingDtoOut addBooking(Long userId, BookingDtoIn dtoIn) {

@@ -1,7 +1,7 @@
 package ru.practicum.shareit.item.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
@@ -28,20 +28,13 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@Qualifier("ItemServiceDB")
+@RequiredArgsConstructor
 public class ItemServiceDB implements ItemService {
 
     private final ItemRepository itemRepo;
     private final UserService userService;
     private final CommentRepository commentRepo;
     private final BookingRepository bookingRepo;
-
-    public ItemServiceDB(ItemRepository itemRepo, @Qualifier("UserServiceDB") UserService userService, CommentRepository commentRepo, BookingRepository bookingRepo) {
-        this.itemRepo = itemRepo;
-        this.userService = userService;
-        this.commentRepo = commentRepo;
-        this.bookingRepo = bookingRepo;
-    }
 
     @Override
     public List<ItemDto> getUserItems(long id) {

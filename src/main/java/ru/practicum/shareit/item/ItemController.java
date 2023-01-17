@@ -1,6 +1,6 @@
 package ru.practicum.shareit.item;
 
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -12,14 +12,11 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/items")
 public class ItemController {
 
     private final ItemService itemService;
-
-    public ItemController(@Qualifier("ItemServiceDB")ItemService itemService) {
-        this.itemService = itemService;
-    }
 
     @PostMapping
     public ItemDto addItem(@RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
