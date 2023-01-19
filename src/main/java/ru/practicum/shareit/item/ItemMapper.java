@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoForRequest;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.ArrayList;
@@ -23,6 +24,15 @@ public class ItemMapper {
                 .description(itemDto.getDescription())
                 .available(itemDto.getAvailable())
                 .build();
+    }
+
+    public static ItemDtoForRequest makeRequestItem(Item item) {
+        return ItemDtoForRequest.builder().id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .available(item.getAvailable())
+             //   .requestId(null)
+             //  .build();
     }
 
 }
