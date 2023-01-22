@@ -2,6 +2,8 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
@@ -37,9 +39,9 @@ public class ItemServiceDB implements ItemService {
     private final BookingRepository bookingRepo;
 
     @Override
-    public List<ItemDto> getUserItems(long id) {
+    public List<ItemDto> getUserItems(long id, Integer from, Integer size) {
         userService.getUser(id);
-        List<Item> items = itemRepo.findAllByOwner(id).stream()
+        List<Item> items = itemRepo.findAllByOwner(id, PageRequest.of(from / size, size)).getContent().stream()
                 .sorted(Comparator.comparing(Item::getId))
                 .collect(Collectors.toList());
         List<ItemDto> itemDtos = new ArrayList<>();
@@ -85,12 +87,14 @@ public class ItemServiceDB implements ItemService {
     }
 
     @Override
-    public List<ItemDto> searchItem(String request) {
+    public List<ItemDto> searchItem(String request, Integer from, Integer size) {
         if (request.isEmpty()) {
             return new ArrayList<>();
         }
+        Pageable pageable = PageRequest.of(from / size, size);
+        List<Item> items = itemRepo.findItemByText(request, pageable).getContent();
         List<ItemDto> itemsDto = new ArrayList<>();
-        for (Item item : itemRepo.findItemByText(request)) {
+        for (Item item : items) {
             itemsDto.add(ItemMapper.makeItemDto(item));
         }
         log.info("Searching Item with keyword {}", request);

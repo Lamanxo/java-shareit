@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import ru.practicum.shareit.booking.BookingMapper;
@@ -35,7 +36,7 @@ public class BookingServiceDb implements BookingService {
         userService.getUser(userId);
         ItemDto itemDto = itemService.getItem(dtoIn.getItemId(),userId);
         Booking booking = BookingMapper.makeBooking(dtoIn);
-        List<ItemDto> itemDtos = itemService.getUserItems(userId);
+        List<ItemDto> itemDtos = itemService.getUserItems(userId, 0, Integer.MAX_VALUE);
         if (itemDtos.contains(itemDto)) {
             throw new BookingException("Owner cant booking his own item");
         }
@@ -74,12 +75,13 @@ public class BookingServiceDb implements BookingService {
     }
 
     @Override
-    public List<BookingDtoOut> getAllByUser(Long userId, String state) {
+    public List<BookingDtoOut> getAllByUser(Long userId, String state, Integer from, Integer size) {
         if (!ObjectUtils.containsConstant(State.values(), state)) {
             throw new BadRequestException("Unknown state: " + state);
         }
         userService.getUser(userId);
-        List<Booking> bookings = bookingRepo.findAllByBookerIdOrderByStartDesc(userId);
+        List<Booking> bookings = bookingRepo.findAllByBookerIdOrderByStartDesc(userId,
+                PageRequest.of(from/size, size)).getContent();
         bookings = getBookingsByState(State.valueOf(state), bookings);
         List<BookingDtoOut> dtoOuts = new ArrayList<>();
         for (Booking booking : bookings) {
@@ -89,12 +91,13 @@ public class BookingServiceDb implements BookingService {
     }
 
     @Override
-    public List<BookingDtoOut> getAllByOwner(Long userId, String state) {
+    public List<BookingDtoOut> getAllByOwner(Long userId, String state, Integer from, Integer size) {
         if (!ObjectUtils.containsConstant(State.values(), state)) {
             throw new BadRequestException("Unknown state: " + state);
         }
         userService.getUser(userId);
-        List<Booking> bookings = bookingRepo.findAllByOwnerStartDesc(userId);
+        List<Booking> bookings = bookingRepo.findAllByOwnerStartDesc(userId,
+                PageRequest.of(from/size, size)).getContent();
         bookings = getBookingsByState(State.valueOf(state),bookings);
         List<BookingDtoOut> dtoOuts = new ArrayList<>();
         for (Booking booking : bookings) {
@@ -137,7 +140,7 @@ public class BookingServiceDb implements BookingService {
     }
 
     private Boolean ownerCheck(Long userId, Long bookingId) {
-        List<ItemDto> listDto = itemService.getUserItems(userId);
+        List<ItemDto> listDto = itemService.getUserItems(userId, 0, Integer.MAX_VALUE);
         Booking booking = bookingOrException(bookingId);
         if (!listDto.contains(itemService.getItem(booking.getItemId(), userId))) {
             return false;
