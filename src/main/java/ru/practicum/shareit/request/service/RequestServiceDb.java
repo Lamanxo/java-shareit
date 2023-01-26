@@ -13,7 +13,7 @@ import ru.practicum.shareit.request.dto.RequestDtoIn;
 import ru.practicum.shareit.request.dto.RequestDtoOut;
 import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.request.repo.RequestRepository;
-import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.user.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
