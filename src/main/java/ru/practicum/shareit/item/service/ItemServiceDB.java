@@ -83,6 +83,7 @@ public class ItemServiceDB implements ItemService {
             item.setAvailable(itemDto.getAvailable());
         }
         log.info("Item {} has been updated", itemId);
+
         return ItemMapper.makeItemDto(itemRepo.save(item));
     }
 

@@ -44,7 +44,7 @@ public class UserServiceTest {
                 .thenReturn(Optional.of(user));
         UserDto userDto = new UserDto();
         userDto.setName("Name2");
-        UserDto returnedDto = userService.updateUser(userDto, 0L);
+        UserDto returnedDto = userService.updateUser(userDto, 1L);
         assertEquals(returnedDto, userDto);
     }
 
