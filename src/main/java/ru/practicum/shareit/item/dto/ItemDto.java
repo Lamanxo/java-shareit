@@ -1,7 +1,9 @@
 package ru.practicum.shareit.item.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import ru.practicum.shareit.booking.model.Booking;
 
 import javax.validation.constraints.NotBlank;
@@ -10,6 +12,8 @@ import java.util.List;
 
 @Data
 @Builder
+@RequiredArgsConstructor
+@AllArgsConstructor
 public class ItemDto {
     private long id;
     @NotNull

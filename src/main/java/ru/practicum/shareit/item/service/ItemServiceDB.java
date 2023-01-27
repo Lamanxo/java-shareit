@@ -115,7 +115,7 @@ public class ItemServiceDB implements ItemService {
         return dto;
     }
 
-    private ItemDto fillWithBookings(ItemDto itemDto) {
+    public ItemDto fillWithBookings(ItemDto itemDto) {
         Optional<Booking> lastBooking = bookingRepo.findLastBooking(itemDto.getId(), LocalDateTime.now());
         itemDto.setLastBooking(lastBooking.orElse(null));
         Optional<Booking> nextBooking = bookingRepo.findNextBooking(itemDto.getId(), LocalDateTime.now());
