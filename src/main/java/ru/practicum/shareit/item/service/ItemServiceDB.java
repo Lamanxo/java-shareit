@@ -152,7 +152,7 @@ public class ItemServiceDB implements ItemService {
         return dto;
     }
 
-    private CommentDto makeFullCommentDto(Comment comment) {
+    public CommentDto makeFullCommentDto(Comment comment) {
         CommentDto dto = CommentMapper.makeCommentDto(comment);
         dto.setAuthorName(userService.getUser(comment.getAuthorId()).getName());
         return dto;

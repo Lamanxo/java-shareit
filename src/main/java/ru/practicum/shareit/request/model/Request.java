@@ -1,8 +1,6 @@
 package ru.practicum.shareit.request.model;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
@@ -12,6 +10,8 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "requests")
+@AllArgsConstructor
+@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Request {
     @Id

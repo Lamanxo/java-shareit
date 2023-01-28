@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.dto;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
@@ -26,8 +25,6 @@ public class ItemDtoTest {
         Booking lastbooking = new Booking(1L, 22L, 2L, LocalDateTime.now(), LocalDateTime.now(), Status.APPROVED);
         Booking nextbooking = new Booking(1L, 21L, 2L, LocalDateTime.now(), LocalDateTime.now(), Status.APPROVED);
         CommentDto commentDto = new CommentDto(1L, "randomText", "RandomAuthor", LocalDateTime.now());
-
-
 
         ItemDto dto = new ItemDto(1L, "randomItem", "RandomDesc", true, List.of(commentDto), lastbooking, nextbooking, 33L);
 
