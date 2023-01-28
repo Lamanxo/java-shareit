@@ -129,7 +129,7 @@ public class ItemControllerTest {
     }
 
     @Test
-    void addComment() throws Exception{
+    void addComment() throws Exception {
         when(itemService.addComment(any(), any(), any()))
                 .thenReturn(commentDto);
 

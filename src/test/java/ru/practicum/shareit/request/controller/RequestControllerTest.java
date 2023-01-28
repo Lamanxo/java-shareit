@@ -41,7 +41,7 @@ public class RequestControllerTest {
     RequestDtoOut dtoOut = new RequestDtoOut(1L,"randomRequest", LocalDateTime.now(), List.of(dto));
 
     @Test
-    void addRequestTest() throws Exception{
+    void addRequestTest() throws Exception {
         when(requestService.addRequest(any(), any()))
                 .thenReturn(dtoOut);
 
@@ -55,7 +55,7 @@ public class RequestControllerTest {
                 .andExpect(jsonPath("$.id", is(dtoOut.getId()), Long.class))
                 .andExpect(jsonPath("$.description", is(dtoOut.getDescription())))
                 .andExpect(jsonPath("$.items.size()", is(dtoOut.getItems().size())));
-    };
+    }
 
     @Test
     void getRequestsByUserTest() throws Exception {
@@ -68,7 +68,7 @@ public class RequestControllerTest {
                 .andExpect(jsonPath("$[0].id", is(dtoOut.getId()), Long.class))
                 .andExpect(jsonPath("$[0].description", is(dtoOut.getDescription())))
                 .andExpect(jsonPath("$[0].items.size()", is(dtoOut.getItems().size())));
-    };
+    }
 
     @Test
     void getRequestsByIdTest() throws Exception {
@@ -81,7 +81,7 @@ public class RequestControllerTest {
                 .andExpect(jsonPath("$.id", is(dtoOut.getId()), Long.class))
                 .andExpect(jsonPath("$.description", is(dtoOut.getDescription())))
                 .andExpect(jsonPath("$.items.size()", is(dtoOut.getItems().size())));
-    };
+    }
 
     @Test
     void getAllByPageTest() throws Exception {
@@ -94,6 +94,6 @@ public class RequestControllerTest {
                 .andExpect(jsonPath("$[0].id", is(dtoOut.getId()), Long.class))
                 .andExpect(jsonPath("$[0].description", is(dtoOut.getDescription())))
                 .andExpect(jsonPath("$[0].items.size()", is(dtoOut.getItems().size())));
-    };
+    }
 
 }

@@ -81,7 +81,7 @@ public class BookingServiceDb implements BookingService {
         }
         userService.getUser(userId);
         List<Booking> bookings = bookingRepo.findAllByBookerIdOrderByStartDesc(userId,
-                PageRequest.of(from/size, size)).getContent();
+                PageRequest.of(from / size, size)).getContent();
         bookings = getBookingsByState(State.valueOf(state), bookings);
         List<BookingDtoOut> dtoOuts = new ArrayList<>();
         for (Booking booking : bookings) {
@@ -97,7 +97,7 @@ public class BookingServiceDb implements BookingService {
         }
         userService.getUser(userId);
         List<Booking> bookings = bookingRepo.findAllByOwnerStartDesc(userId,
-                PageRequest.of(from/size, size)).getContent();
+                PageRequest.of(from / size, size)).getContent();
         bookings = getBookingsByState(State.valueOf(state),bookings);
         List<BookingDtoOut> dtoOuts = new ArrayList<>();
         for (Booking booking : bookings) {

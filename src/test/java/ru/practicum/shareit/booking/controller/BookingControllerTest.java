@@ -48,7 +48,7 @@ public class BookingControllerTest {
     BookingDtoOut dtoOut = new BookingDtoOut(1L, LocalDateTime.now(), LocalDateTime.now(), Status.APPROVED, itemDto, userDto);
 
     @Test
-    void addBookingTest() throws Exception{
+    void addBookingTest() throws Exception {
         when(bookingService.addBooking(any(), any()))
                 .thenReturn(dtoOut);
 
