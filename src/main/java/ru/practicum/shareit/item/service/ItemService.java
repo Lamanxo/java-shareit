@@ -18,11 +18,4 @@ public interface ItemService {
     ItemDto getItem(long itemId, Long userId);
 
     CommentDto addComment(CommentDto commentDto, Long userId, Long itemId);
-
-    //List<ItemDtoForRequest> search(String text, Integer from, Integer size);
-
-
-
-
-
 }
