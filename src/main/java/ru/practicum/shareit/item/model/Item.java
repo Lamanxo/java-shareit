@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
 
@@ -11,16 +12,19 @@ import javax.persistence.*;
 @Table(name = "items")
 @RequiredArgsConstructor
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    Long id;
     @Column(name = "name", nullable = false)
-    private String name;
+    String name;
     @Column(name = "description", nullable = false)
-    private String description;
+    String description;
     @Column(name = "available")
-    private Boolean available;
+    Boolean available;
     @Column(name = "owner_id", nullable = false)
-    private Long owner;
+    Long owner;
+    @Column(name = "request_id")
+    Long requestId;
 }

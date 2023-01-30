@@ -2,6 +2,8 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
@@ -17,7 +19,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repo.CommentRepository;
 import ru.practicum.shareit.item.repo.ItemRepository;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.user.UserService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -37,9 +39,9 @@ public class ItemServiceDB implements ItemService {
     private final BookingRepository bookingRepo;
 
     @Override
-    public List<ItemDto> getUserItems(long id) {
+    public List<ItemDto> getUserItems(long id, Integer from, Integer size) {
         userService.getUser(id);
-        List<Item> items = itemRepo.findAllByOwner(id).stream()
+        List<Item> items = itemRepo.findAllByOwner(id, PageRequest.of(from / size, size)).getContent().stream()
                 .sorted(Comparator.comparing(Item::getId))
                 .collect(Collectors.toList());
         List<ItemDto> itemDtos = new ArrayList<>();
@@ -81,16 +83,19 @@ public class ItemServiceDB implements ItemService {
             item.setAvailable(itemDto.getAvailable());
         }
         log.info("Item {} has been updated", itemId);
+
         return ItemMapper.makeItemDto(itemRepo.save(item));
     }
 
     @Override
-    public List<ItemDto> searchItem(String request) {
+    public List<ItemDto> searchItem(String request, Integer from, Integer size) {
         if (request.isEmpty()) {
             return new ArrayList<>();
         }
+        Pageable pageable = PageRequest.of(from / size, size);
+        List<Item> items = itemRepo.findItemByText(request, pageable).getContent();
         List<ItemDto> itemsDto = new ArrayList<>();
-        for (Item item : itemRepo.findItemByText(request)) {
+        for (Item item : items) {
             itemsDto.add(ItemMapper.makeItemDto(item));
         }
         log.info("Searching Item with keyword {}", request);
@@ -110,7 +115,7 @@ public class ItemServiceDB implements ItemService {
         return dto;
     }
 
-    private ItemDto fillWithBookings(ItemDto itemDto) {
+    public ItemDto fillWithBookings(ItemDto itemDto) {
         Optional<Booking> lastBooking = bookingRepo.findLastBooking(itemDto.getId(), LocalDateTime.now());
         itemDto.setLastBooking(lastBooking.orElse(null));
         Optional<Booking> nextBooking = bookingRepo.findNextBooking(itemDto.getId(), LocalDateTime.now());
@@ -147,7 +152,7 @@ public class ItemServiceDB implements ItemService {
         return dto;
     }
 
-    private CommentDto makeFullCommentDto(Comment comment) {
+    public CommentDto makeFullCommentDto(Comment comment) {
         CommentDto dto = CommentMapper.makeCommentDto(comment);
         dto.setAuthorName(userService.getUser(comment.getAuthorId()).getName());
         return dto;

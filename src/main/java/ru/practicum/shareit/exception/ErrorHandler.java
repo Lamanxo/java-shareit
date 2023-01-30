@@ -27,13 +27,6 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse dataConflict(final ValidationException e) {
-        log.warn("Error conflict data {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse badRequestBooking(final BookingException e) {
         log.warn("Error conflict data {}", e.getMessage());
@@ -41,8 +34,22 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse requestNotFound(final RequestNotFoundException e) {
+        log.warn("Error request not found {}", e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse badRequest(final BadRequestException e) {
+        log.warn("Input data invalid {}", e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse internalServer(final ValidationException e) {
         log.warn("Input data invalid {}", e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
