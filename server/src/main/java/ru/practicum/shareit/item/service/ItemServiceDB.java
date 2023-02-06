@@ -89,9 +89,6 @@ public class ItemServiceDB implements ItemService {
 
     @Override
     public List<ItemDto> searchItem(String request, Integer from, Integer size) {
-        if (request.isEmpty()) {
-            return new ArrayList<>();
-        }
         Pageable pageable = PageRequest.of(from / size, size);
         List<Item> items = itemRepo.findItemByText(request, pageable).getContent();
         List<ItemDto> itemsDto = new ArrayList<>();
